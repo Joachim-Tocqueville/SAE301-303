@@ -1,4 +1,5 @@
 <?php
+ob_start();
 
 // maxime, sebastien, joachim
 
@@ -23,6 +24,9 @@ require_once __DIR__ . '/PHP/orders/OrderManager.php';
 $content = file_get_contents('php://input');
 $data = json_decode($content, true);
 $userManager = new UserManager($pdo);
+
+// On s'assure qu'aucune sortie (lignes vides, BOM, warnings) ne corrompt le JSON
+if (ob_get_length()) ob_clean();
 
 // Utilisateurs
 
