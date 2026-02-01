@@ -1,5 +1,3 @@
-
-
 <?php
 // maxime derènes
 require_once __DIR__ . '/../../../../config/configdb.php'; // connexion

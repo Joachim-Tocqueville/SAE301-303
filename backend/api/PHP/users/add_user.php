@@ -1,5 +1,3 @@
-
-
 <?php
 // par maxime derènes et joaquim
 

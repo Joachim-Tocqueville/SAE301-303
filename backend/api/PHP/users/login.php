@@ -1,5 +1,3 @@
-
-
 <?php
 // par maxime derènes
 // normalement c'est prêt et adapté pour être utilisé
