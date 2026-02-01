@@ -31,7 +31,7 @@ class UserManager
             throw new Exception("Données manquantes : nom, prenom, email, password, telephone et adresse sont requis.");
         }
 
-        $sqlCheck = "SELECT id_user FROM utilisateur WHERE email = :email";
+        $sqlCheck = "SELECT id_user FROM utilisateur WHERE LOWER(email) = LOWER(:email)";
         $stmtCheck = $this->pdo->prepare($sqlCheck);
         $stmtCheck->execute(['email' => $email]);
         if ($stmtCheck->fetch()) {
@@ -57,9 +57,20 @@ class UserManager
     }
 
 
-    public function login(string $email, string $password): array
+    public function login($email, $password): array
     {
-        $sql = "SELECT * FROM utilisateur WHERE email = :email";
+        // On permet les différents noms de champs possibles
+        if (is_array($email)) {
+            $data = $email;
+            $email = $data['email'] ?? ($data['email_conn'] ?? ($data['email_inscr'] ?? null));
+            $password = $data['password'] ?? ($data['mdp_conn'] ?? ($data['mdp_inscr'] ?? null));
+        }
+
+        if (!$email || !$password) {
+            return ['success' => false, 'message' => 'Email ou mot de passe manquant'];
+        }
+
+        $sql = "SELECT * FROM utilisateur WHERE LOWER(email) = LOWER(:email)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);

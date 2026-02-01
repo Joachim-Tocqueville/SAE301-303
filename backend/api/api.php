@@ -118,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['reponse' => 'utilisateur créé', 'success' => true]);
             exit;
         } catch (Exception $e) {
+            error_log("Erreur inscription: " . $e->getMessage());
             http_response_code($e->getMessage() === "L'email existe déjà" ? 409 : 400);
             echo json_encode(['error' => $e->getMessage(), 'success' => false]);
             exit;
@@ -125,14 +126,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Connexion (seulement si pas d'action spécifique)
-    if (isset($data['email']) && isset($data['password']) && !isset($data['action'])) {
-        $result = $userManager->login($data['email'], $data['password']);
-        if ($result['success']) {
-            http_response_code(200);
-            echo json_encode($result);
-        } else {
-            http_response_code(401);
-            echo json_encode(['reponse' => $result['message'], 'success' => false]);
+    // On vérifie soit les champs directs, soit un flag d'action, soit la présence d'email/password même avec d'autres noms
+    $isLoginAttempt = (!isset($data['action']) || $data['action'] === 'login') && 
+                      (isset($data['email']) || isset($data['email_conn']) || isset($data['email_inscr'])) &&
+                      (isset($data['password']) || isset($data['mdp_conn']) || isset($data['mdp_inscr']));
+
+    if ($isLoginAttempt && !isset($data['nom'])) { // !isset($data['nom']) pour ne pas confondre avec l'inscription
+        try {
+            $result = $userManager->login($data, null);
+            if ($result['success']) {
+                http_response_code(200);
+                echo json_encode($result);
+            } else {
+                http_response_code(401);
+                echo json_encode(['reponse' => $result['message'], 'success' => false]);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'reponse' => 'Erreur serveur lors de la connexion', 'error' => $e->getMessage()]);
         }
         exit;
     }
