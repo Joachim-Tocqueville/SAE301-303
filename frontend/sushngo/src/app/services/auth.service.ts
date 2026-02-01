@@ -36,7 +36,7 @@ export interface SessionStatus {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost/SAE301-303/backend/api/api.php';
+  private apiUrl = 'https://sae301-303.onrender.com/api.php';
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
   private currentUserSubject = new BehaviorSubject<User | null>(null); // valeur = soit User complet soit null , behaviorSubject sert a sauvegarder les données de l'user , pour etre accessibles depuis les autres composants sans avoir besoin de les recharger

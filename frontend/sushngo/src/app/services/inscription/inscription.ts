@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class InscriptionService {
-  private apiUrl = 'http://localhost/SAE301-303/backend/api/api.php';
+  private apiUrl = 'https://sae301-303.onrender.com/api.php';
 
   constructor(private http: HttpClient) { }
 

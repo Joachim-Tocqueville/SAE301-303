@@ -20,7 +20,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ConnexionApi {
-  protected API_URL = "postgresql://postgres:[SAE301-303Jojo19!]@db.lxvxcfblghhlasmyravm.supabase.co:5432/postgres";
+  protected API_URL = "https://sae301-303.onrender.com/api.php";
 
   // oral sae conseil : a redirigé vers le json / d'une autre manière
 
