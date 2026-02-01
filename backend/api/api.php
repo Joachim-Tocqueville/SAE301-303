@@ -22,6 +22,7 @@ session_set_cookie_params([
     'httponly' => true,
     'samesite' => 'None',
 ]);
+session_start();
 
 require_once __DIR__ . '/../config/configdb.php';
 require_once __DIR__ . '/PHP/users/manager/UserManager.php';
@@ -50,9 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
         exit;
     }
     if ($_GET['action'] === 'get-orders') {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
         $id_user = $_SESSION['id_user'] ?? null;
         if (!$id_user) {
             http_response_code(401);
@@ -88,9 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Déconnexion
         if ($data['action'] === 'logout') {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
             $id_user = $_SESSION['id_user'] ?? null;
             if ($id_user) {
                 echo json_encode($userManager->logout($id_user));
@@ -102,9 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Mise à jour des informations utilisateur
         if ($data['action'] === 'update-user') {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
             $id_user = $_SESSION['id_user'] ?? null;
             if (!$id_user) {
                 http_response_code(401);
@@ -183,10 +175,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($data['action'])) {
         if ($data['action'] === 'create-commande') {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
-            
             $id_user = $_SESSION['id_user'] ?? null;
             
             if (!$id_user) {
