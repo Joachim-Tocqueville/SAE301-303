@@ -28,7 +28,7 @@ export interface AuthResponse {
 export class PanierService {
 
   produitsPanier: any[] = []; // Tableau des produits dans le panier
-  private apiUrl = 'https://sae301-303.onrender.com/api.php';
+  private apiUrl = 'https://sae301-303.onrender.com/api/api.php';
 
   constructor(private http: HttpClient) {
     this.chargerPanier();

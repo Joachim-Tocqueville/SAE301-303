@@ -20,7 +20,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ConnexionApi {
-  protected API_URL = "https://sae301-303.onrender.com/api.php";
+  protected API_URL = "https://sae301-303.onrender.com/api/api.php";
 
   // oral sae conseil : a redirigé vers le json / d'une autre manière
 
