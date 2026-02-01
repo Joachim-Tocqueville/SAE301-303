@@ -2,7 +2,7 @@
 $host = "aws-1-eu-central-1.pooler.supabase.com";
 $port = "6543";
 $db = "postgres";
-$user = "postgres";
+$user = "postgres.lxvxcfblghhlasmyravm";
 $pass = "SAE301-303Jojo19!";
 $charset = 'utf8mb4';
      
