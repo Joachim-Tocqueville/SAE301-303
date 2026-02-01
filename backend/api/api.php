@@ -14,6 +14,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// Configuration des sessions pour le cross-domain (Netlify <-> Render)
+session_set_cookie_params([
+    'lifetime' => 86400,
+    'path' => '/',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'None',
+]);
+
 require_once __DIR__ . '/../config/configdb.php';
 require_once __DIR__ . '/PHP/users/manager/UserManager.php';
 require_once __DIR__ . '/PHP/boxes/boxmanager.php';
