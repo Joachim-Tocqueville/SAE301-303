@@ -53,7 +53,7 @@ export class Compte implements OnInit {
     telephone: ''
   };
 
-  private apiUrl = 'http://localhost/SAE301-303/backend/api/api.php';
+  private apiUrl = 'https://sae301-303.onrender.com/api/api.php';
 
   constructor(
     private authService: AuthService,

@@ -221,7 +221,7 @@ class UserManager
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if ($user) {
-            $nouvelleFidelite = ($user['fidelite'] ?? 0) + $montant;
+            $nouvelleFidelite = (int)round(($user['fidelite'] ?? 0) + $montant);
             $this->setFidelite($id_user, $nouvelleFidelite);
             
             // Mettre à jour la session si elle existe
