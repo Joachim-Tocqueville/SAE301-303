@@ -1,8 +1,8 @@
 <?php
 
-// maxime, sebastien, joaquim
+// maxime, sebastien, joachim
 
-header('Access-Control-Allow-Origin: http://localhost:4200');
+header('Access-Control-Allow-Origin: https://sae301-303.netlify.app');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Credentials: true');
