@@ -252,8 +252,8 @@ class UserManager
             }
 
             // Vérifier si l'email est modifié et s'il n'existe pas déjà
-            if (isset($data['email']) && $data['email'] !== $user['email']) {
-                $sqlEmailCheck = "SELECT id_user FROM utilisateur WHERE email = :email AND id_user != :id_user";
+            if (isset($data['email']) && strtolower($data['email']) !== strtolower($user['email'])) {
+                $sqlEmailCheck = "SELECT id_user FROM utilisateur WHERE LOWER(email) = LOWER(:email) AND id_user != :id_user";
                 $stmtEmailCheck = $this->pdo->prepare($sqlEmailCheck);
                 $stmtEmailCheck->execute(['email' => $data['email'], 'id_user' => $id_user]);
                 if ($stmtEmailCheck->fetch()) {

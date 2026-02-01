@@ -61,12 +61,12 @@ class OrderManager
     {
         try {
             $sql = "SELECT c.id_commande, c.date_commande, c.prix_total, c.mode,
-                           GROUP_CONCAT(CONCAT(p.nom, ' (x', dc.quantite, ')') SEPARATOR ', ') as produits
+                           STRING_AGG(p.nom || ' (x' || dc.quantite || ')', ', ') as produits
                     FROM commande c
                     LEFT JOIN detail_commande dc ON c.id_commande = dc.id_commande
                     LEFT JOIN produit p ON dc.id_produit = p.id_produit
                     WHERE c.id_user = :id_user
-                    GROUP BY c.id_commande
+                    GROUP BY c.id_commande, c.date_commande, c.prix_total, c.mode
                     ORDER BY c.date_commande DESC";
 
             $stmt = $this->pdo->prepare($sql);

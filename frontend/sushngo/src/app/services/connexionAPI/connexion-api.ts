@@ -27,11 +27,11 @@ export class ConnexionApi {
   constructor(private http: HttpClient) { }
 
   getUserDataFromApi() {
-    return this.http.get(`${this.API_URL}/api.php`);
+    return this.http.get(`${this.API_URL}`);
   }
 
   getStats() {
-    return this.http.get(`${this.API_URL}/api.php?action=stats`); // action stats sert à récupérer les stats
+    return this.http.get(`${this.API_URL}?action=stats`); // action stats sert à récupérer les stats
   }
 
   inscription(inscriptionData: {
@@ -55,7 +55,7 @@ export class ConnexionApi {
       statut_etud: inscriptionData.etudiant ? 1 : 0
     };
 
-    return this.http.post(`${this.API_URL}/api.php`, dataForApi, {
+    return this.http.post(`${this.API_URL}`, dataForApi, {
       withCredentials: true
     });
   }
