@@ -19,16 +19,16 @@ class OrderManager
             $this->pdo->beginTransaction();
 
             // Insérer la commande principale
-            $sql = "INSERT INTO commande (id_user, date_commande, prix_total, mode) VALUES (:id_user, NOW(), :prix_total, :mode)";
+            $sql = "INSERT INTO commande (id_user, date_commande, prix_total, mode) VALUES (:id_user, NOW(), :prix_total, :mode) RETURNING id_commande";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
                 'id_user' => $id_user,
                 'prix_total' => $prix_total,
                 'mode' => $mode
             ]);
-
+            
             // Récupérer l'ID de la commande qu'on vient de créer
-            $id_commande = $this->pdo->lastInsertId();
+            $id_commande = $stmt->fetchColumn();
 
             // Insérer chaque produit dans detail_commande
             $sqlDetail = "INSERT INTO detail_commande (id_commande, id_produit, quantite) VALUES (:id_commande, :id_produit, :quantite)";

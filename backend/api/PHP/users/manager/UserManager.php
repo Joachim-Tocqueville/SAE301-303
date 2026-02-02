@@ -94,18 +94,27 @@ class UserManager
             $_SESSION['tel'] = $user['tel'];
             $_SESSION['adresse'] = $user['adresse'];
             $_SESSION['fidelite'] = $user['fidelite'];
+ 
+            // Définir un cookie persistant pour la restauration de session (SameSite=None pour cross-domain)
+            setcookie('api_token', $token, [
+                'expires' => time() + (86400 * 1), // 1 jour
+                'path' => '/',
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'None',
+            ]);
 
-            return [
-                'success' => true,
-                'api_token' => $token,
-                'user' => [
-                    'id_user' => $user['id_user'],
-                    'nom' => $user['nom'],
-                    'prenom' => $user['prenom'],
-                    'email' => $user['email'],
-                    'statut_etud' => (bool)$user['statut_etud']
-                ]
-            ];
+             return [
+                 'success' => true,
+                 'api_token' => $token,
+                 'user' => [
+                     'id_user' => $user['id_user'],
+                     'nom' => $user['nom'],
+                     'prenom' => $user['prenom'],
+                     'email' => $user['email'],
+                     'statut_etud' => (bool)$user['statut_etud']
+                 ]
+             ];
         }
 
         return ['success' => false, 'message' => 'Email ou mot de passe incorrect'];
@@ -124,8 +133,17 @@ class UserManager
             session_start();
         }
         session_destroy();
+ 
+        // Supprimer le cookie de restauration
+        setcookie('api_token', '', [
+            'expires' => time() - 3600,
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'None',
+        ]);
 
-        return ['success' => true];
+         return ['success' => true];
     }
 
 
@@ -135,48 +153,45 @@ class UserManager
             session_start();
         }
 
-        // Vérifier d'abord si un token existe dans la session
-        if (empty($_SESSION['api_token']) || empty($_SESSION['id_user'])) {
+        // Si la session PHP est vide, on tente de la restaurer via le cookie api_token
+        if ((empty($_SESSION['api_token']) || empty($_SESSION['id_user'])) && !empty($_COOKIE['api_token'])) {
+            $sql = "SELECT * FROM utilisateur WHERE api_token = :token";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['token' => $_COOKIE['api_token']]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                // Restauration de la session depuis les données de la DB
+                $_SESSION['id_user'] = $user['id_user'];
+                $_SESSION['api_token'] = $user['api_token'];
+                $_SESSION['nom'] = $user['nom'];
+                $_SESSION['prenom'] = $user['prenom'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['statut_etud'] = $user['statut_etud'];
+                $_SESSION['tel'] = $user['tel'];
+                $_SESSION['adresse'] = $user['adresse'];
+                $_SESSION['fidelite'] = $user['fidelite'];
+            }
+        }
+
+        // Si on a une session valide (soit déjà présente, soit restaurée)
+        if (!empty($_SESSION['api_token']) && !empty($_SESSION['id_user'])) {
             return [
-                'logged_in' => false,
-                'user_id' => null,
-                'api_token' => null
+                'isLoggedIn' => true,
+                'user' => [
+                    'id_user' => $_SESSION['id_user'],
+                    'nom' => $_SESSION['nom'] ?? '',
+                    'prenom' => $_SESSION['prenom'] ?? '',
+                    'email' => $_SESSION['email'] ?? '',
+                    'statut_etud' => (bool)($_SESSION['statut_etud'] ?? false),
+                    'tel' => $_SESSION['tel'] ?? '',
+                    'adresse' => $_SESSION['adresse'] ?? '',
+                    'fidelite' => $_SESSION['fidelite'] ?? 0
+                ]
             ];
         }
 
-        // Vérifier que le token existe réellement en base de données et correspond à l'utilisateur
-        $sql = "SELECT * FROM utilisateur WHERE id_user = :id_user AND api_token = :api_token";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            'id_user' => $_SESSION['id_user'],
-            'api_token' => $_SESSION['api_token']
-        ]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        // Si l'utilisateur n'existe pas ou le token ne correspond pas, la session est invalide
-        if (!$user) {
-            // Nettoyer la session invalide
-            session_destroy();
-            return [
-                'logged_in' => false,
-                'user_id' => null,
-                'api_token' => null
-            ];
-        }
-
-        return [
-            'logged_in' => true,
-            'user' => [
-                'id_user' => $user['id_user'],
-                'nom' => $user['nom'],
-                'prenom' => $user['prenom'],
-                'email' => $user['email'],
-                'statut_etud' => (bool)$user['statut_etud'],
-                'tel' => $user['tel'],
-                'adresse' => $user['adresse'],
-                'fidelite' => (int)$user['fidelite']
-            ]
-        ];
+        return ['isLoggedIn' => false, 'user' => null];
     }
 
     public function resetPassword(string $email, string $newPassword): array

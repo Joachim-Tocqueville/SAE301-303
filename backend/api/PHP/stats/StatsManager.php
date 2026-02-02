@@ -52,7 +52,7 @@ class StatsManager
                    COUNT(*) as orders 
             FROM commande 
             WHERE date_commande >= CURRENT_DATE - INTERVAL '6 days' 
-            GROUP BY date_commande::date 
+            GROUP BY date_commande::date, TO_CHAR(date_commande, 'Dy') 
             ORDER BY date_commande::date ASC";
         return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
