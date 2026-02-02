@@ -97,7 +97,7 @@ class UserManager
  
             // FIX DÉFINITIF DÉCONNEXIONS : Cookie persistant pour restaurer la session si le serveur Render redémarre
             setcookie('api_token', $token, [
-                'expires' => time() + (86400 * 30), // 30 jours
+                'expires' => time() + (86400 * 1), // 1 jour
                 'path' => '/',
                 'secure' => true,
                 'httponly' => true,
