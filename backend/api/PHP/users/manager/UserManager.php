@@ -95,16 +95,7 @@ class UserManager
             $_SESSION['adresse'] = $user['adresse'];
             $_SESSION['fidelite'] = $user['fidelite'];
  
-            // Définir un cookie persistant pour la restauration de session (SameSite=None pour cross-domain)
-            setcookie('api_token', $token, [
-                'expires' => time() + (86400 * 1), // 1 jour
-                'path' => '/',
-                'secure' => true,
-                'httponly' => true,
-                'samesite' => 'None',
-            ]);
-
-             return [
+            return [
                  'success' => true,
                  'api_token' => $token,
                  'user' => [
@@ -134,15 +125,6 @@ class UserManager
         }
         session_destroy();
  
-        // Supprimer le cookie de restauration
-        setcookie('api_token', '', [
-            'expires' => time() - 3600,
-            'path' => '/',
-            'secure' => true,
-            'httponly' => true,
-            'samesite' => 'None',
-        ]);
-
          return ['success' => true];
     }
 
@@ -153,45 +135,27 @@ class UserManager
             session_start();
         }
 
-        // Si la session PHP est vide, on tente de la restaurer via le cookie api_token
-        if ((empty($_SESSION['api_token']) || empty($_SESSION['id_user'])) && !empty($_COOKIE['api_token'])) {
-            $sql = "SELECT * FROM utilisateur WHERE api_token = :token";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute(['token' => $_COOKIE['api_token']]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($user) {
-                // Restauration de la session depuis les données de la DB
-                $_SESSION['id_user'] = $user['id_user'];
-                $_SESSION['api_token'] = $user['api_token'];
-                $_SESSION['nom'] = $user['nom'];
-                $_SESSION['prenom'] = $user['prenom'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['statut_etud'] = $user['statut_etud'];
-                $_SESSION['tel'] = $user['tel'];
-                $_SESSION['adresse'] = $user['adresse'];
-                $_SESSION['fidelite'] = $user['fidelite'];
-            }
-        }
-
-        // Si on a une session valide (soit déjà présente, soit restaurée)
-        if (!empty($_SESSION['api_token']) && !empty($_SESSION['id_user'])) {
+        // Vérifier d'abord si un token existe dans la session
+        if (empty($_SESSION['api_token']) || empty($_SESSION['id_user'])) {
             return [
-                'isLoggedIn' => true,
-                'user' => [
-                    'id_user' => $_SESSION['id_user'],
-                    'nom' => $_SESSION['nom'] ?? '',
-                    'prenom' => $_SESSION['prenom'] ?? '',
-                    'email' => $_SESSION['email'] ?? '',
-                    'statut_etud' => (bool)($_SESSION['statut_etud'] ?? false),
-                    'tel' => $_SESSION['tel'] ?? '',
-                    'adresse' => $_SESSION['adresse'] ?? '',
-                    'fidelite' => $_SESSION['fidelite'] ?? 0
-                ]
+                'isLoggedIn' => false,
+                'user' => null
             ];
         }
 
-        return ['isLoggedIn' => false, 'user' => null];
+        return [
+            'isLoggedIn' => true,
+            'user' => [
+                'id_user' => $_SESSION['id_user'],
+                'nom' => $_SESSION['nom'] ?? '',
+                'prenom' => $_SESSION['prenom'] ?? '',
+                'email' => $_SESSION['email'] ?? '',
+                'statut_etud' => (bool)($_SESSION['statut_etud'] ?? false),
+                'tel' => $_SESSION['tel'] ?? '',
+                'adresse' => $_SESSION['adresse'] ?? '',
+                'fidelite' => $_SESSION['fidelite'] ?? 0
+            ]
+        ];
     }
 
     public function resetPassword(string $email, string $newPassword): array
